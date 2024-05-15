@@ -18,7 +18,6 @@ const createPreviewElement = (matches, parentElement) => {
       <img
         class="preview__image"
         src="${image}"
-        alt="${title} Cover"
       />
       
       <div class="preview__info">
@@ -33,28 +32,29 @@ const createPreviewElement = (matches, parentElement) => {
   parentElement.appendChild(fragment);
 };
 
+// This function is to create genre options and append them to the genre select element
+
+const createGenreOptions = () => {
+  const genreHTML = document.createDocumentFragment();
+  const firstGenreElement = document.createElement("option");
+  firstGenreElement.value = "any";
+  firstGenreElement.innerText = "All Genres";
+  genreHTML.appendChild(firstGenreElement);
+
+  for (const [id, name] of Object.entries(genres)) {
+    const element = document.createElement("option");
+    element.value = id;
+    element.innerText = name;
+    genreHTML.appendChild(element);
+  }
+
+  document.querySelector("[data-search-genres]").appendChild(genreHTML);
+};
+
 const startingElement = document.querySelector("[data-list-items]");
+
 createPreviewElement(matches, startingElement);
-
-document.querySelector("[data-list-items]").appendChild(starting);
-
-// create an arrow function that is going hold the genre options
-// create the first option that will append new genre options
-
-const genreHtml = document.createDocumentFragment();
-const firstGenreElement = document.createElement("option");
-firstGenreElement.value = "any";
-firstGenreElement.innerText = "All Genres";
-genreHtml.appendChild(firstGenreElement);
-
-for (const [id, name] of Object.entries(genres)) {
-  const element = document.createElement("option");
-  element.value = id;
-  element.innerText = name;
-  genreHtml.appendChild(element);
-}
-
-document.querySelector("[data-search-genres]").appendChild(genreHtml);
+createGenreOptions();
 
 const authorsHtml = document.createDocumentFragment();
 const firstAuthorElement = document.createElement("option");
