@@ -80,16 +80,19 @@ createAuthorOptions();
 const setTheme = () => {
   const theme = localStorage.getItem("theme");
   if (theme === "night") {
-    document.documentElement.style.setProperty("--color-dark", "255, 255, 255");
+    document.documentElement.style.setProperty(
+      "--color-dark",
+      "rgb(255, 255, 255)"
+    );
   }
 
   if (theme === "day") {
-    document.documentElement.style.setProperty("--color-dark", "0, 0, 0");
+    document.documentElement.style.setProperty("--color-dark", "rgb(0, 0, 0)");
   }
 
   if (!theme) {
     localStorage.setItem("theme", "day");
-    document.documentElement.style.setProperty("--color-dark", "0, 0, 0");
+    document.documentElement.style.setProperty("--color-dark", "rgb(0, 0, 0)");
   }
 
   document.querySelector("[data-settings-theme]").value = theme;
@@ -97,6 +100,36 @@ const setTheme = () => {
 setTheme();
 
 // this is to update the show more button
+
+const updatedShowMoreButton = () => {
+  if (matches.length > BOOKS_PER_PAGE) {
+    document.querySelector("[data-list-button]").open = true;
+  } else {
+    document.querySelector("[data-list-button]").open = false;
+  }
+
+  if (matches.length - page * BOOKS_PER_PAGE < 1) {
+    document.querySelector("[data-list-button]").innerHTML = `
+        <span>Show more</span>
+        <span class="list__remaining"> (${
+          matches.length - page * BOOKS_PER_PAGE > 0
+            ? matches.length - page * BOOKS_PER_PAGE
+            : 0
+        } remaining)</span>
+    `;
+  } else {
+    document.querySelector("[data-list-button]").innerHTML = `
+        <span>Show more</span>
+        <span class="list__remaining"> (${
+          matches.length - page * BOOKS_PER_PAGE > 0
+            ? matches.length - page * BOOKS_PER_PAGE
+            : 0
+        } remaining)</span>
+    `;
+  }
+};
+
+updatedShowMoreButton();
 // Event listeners
 
 document.querySelector("[data-search-cancel]").addEventListener("click", () => {
@@ -123,30 +156,6 @@ document
 document.querySelector("[data-list-close]").addEventListener("click", () => {
   document.querySelector("[data-list-active]").open = false;
 });
-
-document
-  .querySelector("[data-settings-form]")
-  .addEventListener("submit", (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const { theme } = Object.fromEntries(formData);
-
-    if (theme === "night") {
-      document.documentElement.style.setProperty(
-        "--color-dark",
-        "255, 255, 255"
-      );
-      document.documentElement.style.setProperty("--color-light", "10, 10, 20");
-    } else {
-      document.documentElement.style.setProperty("--color-dark", "10, 10, 20");
-      document.documentElement.style.setProperty(
-        "--color-light",
-        "255, 255, 255"
-      );
-    }
-
-    document.querySelector("[data-settings-overlay]").open = false;
-  });
 
 document
   .querySelector("[data-search-form]")
