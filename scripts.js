@@ -77,22 +77,13 @@ const createAuthorOptions = () => {
 createAuthorOptions();
 
 // this is to set a theme to day and night
-const setTheme = () => {
-  const theme = localStorage.getItem("theme");
+const setTheme = (theme) => {
   if (theme === "night") {
-    document.documentElement.style.setProperty(
-      "--color-dark",
-      "rgb(255, 255, 255)"
-    );
-  }
-
-  if (theme === "day") {
-    document.documentElement.style.setProperty("--color-dark", "rgb(0, 0, 0)");
-  }
-
-  if (!theme) {
-    localStorage.setItem("theme", "day");
-    document.documentElement.style.setProperty("--color-dark", "rgb(0, 0, 0)");
+    document.documentElement.classList.add("dark-theme");
+    document.documentElement.classList.remove("light-theme");
+  } else {
+    document.documentElement.classList.add("light-theme");
+    document.documentElement.classList.remove("dark-theme");
   }
 
   document.querySelector("[data-settings-theme]").value = theme;
@@ -130,33 +121,47 @@ const updatedShowMoreButton = () => {
 };
 
 updatedShowMoreButton();
-// Event listeners
+// Event listeners for header search, settings, and list close
 
-document.querySelector("[data-search-cancel]").addEventListener("click", () => {
+const handleSearchCancel = () => {
   document.querySelector("[data-search-overlay]").open = false;
-});
+};
 
-document
-  .querySelector("[data-settings-cancel]")
-  .addEventListener("click", () => {
-    document.querySelector("[data-settings-overlay]").open = false;
-  });
+const handleSettingsCancel = () => {
+  document.querySelector("[data-settings-overlay]").open = false;
+};
 
-document.querySelector("[data-header-search]").addEventListener("click", () => {
+const handleHeaderSearch = () => {
   document.querySelector("[data-search-overlay]").open = true;
   document.querySelector("[data-search-title]").focus();
-});
+};
 
+const handleHeaderSettings = () => {
+  document.querySelector("[data-settings-overlay]").open = true;
+};
+
+const handleListClose = () => {
+  document.querySelector("[data-list-active]").open = false;
+};
+
+// Add event listeners using the defined functions
+document
+  .querySelector("[data-search-cancel]")
+  .addEventListener("click", handleSearchCancel);
+document
+  .querySelector("[data-settings-cancel]")
+  .addEventListener("click", handleSettingsCancel);
+document
+  .querySelector("[data-header-search]")
+  .addEventListener("click", handleHeaderSearch);
 document
   .querySelector("[data-header-settings]")
-  .addEventListener("click", () => {
-    document.querySelector("[data-settings-overlay]").open = true;
-  });
+  .addEventListener("click", handleHeaderSettings);
+document
+  .querySelector("[data-list-close]")
+  .addEventListener("click", handleListClose);
 
-document.querySelector("[data-list-close]").addEventListener("click", () => {
-  document.querySelector("[data-list-active]").open = false;
-});
-
+// document...
 document
   .querySelector("[data-search-form]")
   .addEventListener("submit", (event) => {
