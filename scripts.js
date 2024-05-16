@@ -252,65 +252,77 @@ function closeSearchOverlay() {
 document.querySelector("[data-list-button]").addEventListener("click", () => {
   const fragment = document.createDocumentFragment();
 
-  matches
-    .slice(page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE)
-    .forEach(({ author, id, image, title }) => {
-      const element = createPreviewButton(author, id, image, title);
-      fragment.appendChild(element);
-    });
+  for (const { author, id, image, title } of matches.slice(
+    page * BOOKS_PER_PAGE,
+    (page + 1) * BOOKS_PER_PAGE
+  )) {
+    const element = document.createElement("button");
+    element.classList = "preview";
+    element.setAttribute("data-preview", id);
+
+    element.innerHTML = `
+            <img
+                class="preview__image"
+                src="${image}"
+            />
+            
+            <div class="preview__info">
+                <h3 class="preview__title">${title}</h3>
+                <div class="preview__author">${authors[author]}</div>
+            </div>
+        `;
+
+    fragment.appendChild(element);
+  }
 
   document.querySelector("[data-list-items]").appendChild(fragment);
-  page = +1;
+  page += 1;
 });
 
-const createPreviewButton = (author, id, image, title) => {
-  const element = document.createElement("button");
-  element.classList = "preview";
-  element.setAttribute("data-preview", id);
+const handleListItemClick = (event) => {
+  const targetBookId = event.target.dataset.preview;
 
-  element.innerHTML = `
-      <img class="preview__image" src="${image}" />
-      <div class="preview__info">
-      <h3 class="preview__title">${title}</h3>
-      <div class="preview__author">${author[author]}</div>
-      </div>
-      `;
+  if (!targetBookId) return;
 
-  return element;
+  const activeBook = findBookById(targetBookId);
+
+  if (!activeBook) return;
+
+  displayActiveBook(activeBook);
 };
 
-// docs
+const findBookById = (id) => {
+  return books.find((book) => book.id === id) || null;
+};
+
+const displayActiveBook = (book) => {
+  const listActive = document.querySelector("[data-list-active]");
+  const listBlur = document.querySelector("[data-list-blur]");
+  const listImage = document.querySelector("[data-list-image]");
+  const listTitle = document.querySelector("[data-list-title]");
+  const listSubtitle = document.querySelector("[data-list-subtitle]");
+  const listDescription = document.querySelector("[data-list-description]");
+
+  if (
+    !listActive ||
+    !listBlur ||
+    !listImage ||
+    !listTitle ||
+    !listSubtitle ||
+    !listDescription
+  )
+    return;
+
+  listActive.open = true;
+  listBlur.src = book.image;
+  listImage.src = book.image;
+  listTitle.innerText = book.title;
+  listSubtitle.innerText = `${authors[book.author]} (${new Date(
+    book.published
+  ).getFullYear()})`;
+  listDescription.innerText = book.description;
+};
 
 document
   .querySelector("[data-list-items]")
-  .addEventListener("click", (event) => {
-    const pathArray = Array.from(event.path || event.composedPath());
-    let active = null;
-
-    for (const node of pathArray) {
-      if (active) break;
-
-      if (node?.dataset?.preview) {
-        let result = null;
-
-        for (const singleBook of books) {
-          if (result) break;
-          if (singleBook.id === node?.dataset?.preview) result = singleBook;
-        }
-
-        active = result;
-      }
-    }
-
-    if (active) {
-      document.querySelector("[data-list-active]").open = true;
-      document.querySelector("[data-list-blur]").src = active.image;
-      document.querySelector("[data-list-image]").src = active.image;
-      document.querySelector("[data-list-title]").innerText = active.title;
-      document.querySelector("[data-list-subtitle]").innerText = `${
-        authors[active.author]
-      } (${new Date(active.published).getFullYear()})`;
-      document.querySelector("[data-list-description]").innerText =
-        active.description;
-    }
-  });
+  .addEventListener("click", handleListItemClick);
